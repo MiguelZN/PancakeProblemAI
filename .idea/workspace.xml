@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2186b584-3b72-4e4a-9356-e5016c26535c" name="Default Changelist" comment="" />
+    <list default="true" id="2186b584-3b72-4e4a-9356-e5016c26535c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,8 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4262">
-              <caret line="434" column="48" lean-forward="true" selection-start-line="434" selection-start-column="48" selection-end-line="434" selection-end-column="48" />
+            <state relative-caret-position="331">
+              <caret line="533" column="17" selection-start-line="533" selection-start-column="17" selection-end-line="533" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -35,6 +39,9 @@
       <find>getSorte</find>
     </findStrings>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -48,6 +55,7 @@
     <option name="width" value="720" />
     <option name="height" value="877" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -122,7 +130,7 @@
     <frame x="720" y="23" width="720" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.08869814" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11444921" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -144,8 +152,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4262">
-          <caret line="434" column="48" lean-forward="true" selection-start-line="434" selection-start-column="48" selection-end-line="434" selection-end-column="48" />
+        <state relative-caret-position="331">
+          <caret line="533" column="17" selection-start-line="533" selection-start-column="17" selection-end-line="533" selection-end-column="17" />
         </state>
       </provider>
     </entry>
