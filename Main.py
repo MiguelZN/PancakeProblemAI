@@ -10,6 +10,36 @@ class Pancake:
         #return "Pancake" + str(self.id)
         return "POS:"+str(self.position)+";Pancake"+str(self.id)
 
+class PancakeSeq:
+    def __init__(self, seq:str, parent = None, children = None, isRoot=False):
+        self.seq = seq
+        self.parent = parent
+        self.children = None
+        self.isRoot=isRoot
+
+        self.flipPosition = -1 #-1 should be root
+
+
+    def __eq__(self, other):
+        if(isinstance(other, PancakeSeq)):
+            return self.seq==other.seq
+        elif(isinstance(other,str)):
+            return self.seq==other
+        else:
+            return False
+
+
+    def getSeq(self):
+        return self.seq
+    def getParent(self):
+        return self.parent
+
+    def __str__(self):
+        return self.seq
+
+
+
+
 class PancakeStack:
     def __init__(self):
         self.stack = []
@@ -320,7 +350,7 @@ def tiebreakingFunction(pancakeseq1, pancakeseq2):
 def createPancakeHeap(startPancakeSeq:str):
     ''
 
-def pancakeDFS(startPancakeSeq:str):
+def pancakeDFSStr(startPancakeSeq:str):
     # AI:----------------
     pancakeFringe = []
     pancakeClosedSet = set([]) #contains all of the visited node states already
@@ -332,9 +362,6 @@ def pancakeDFS(startPancakeSeq:str):
     #Adding start state to fringe
     pancakeFringe.append(currStateStr)
 
-
-    print(PancakeStack.SimHasReachedGoal('4321'))
-
     #Number of total states = n! where n is the number of pancakes
     #In our case n = 4, thus 4! = 24 total possible states
     while(num_pancakestates>=len(pancakeClosedSet) or len(pancakeFringe)==0):
@@ -344,6 +371,8 @@ def pancakeDFS(startPancakeSeq:str):
 
         currStateStr = pancakeFringe.__getitem__(0)#get first pancake state in fringe
         pancakeFringe.remove(currStateStr)#Remove from fringe
+
+
 
         #Converting pancakeSeqString into a pancake list and get all possible flip states from it
         currStatePancakeList = PancakeStack.convertPancakeSeqStrToList(currStateStr)
@@ -373,6 +402,98 @@ def pancakeDFS(startPancakeSeq:str):
             print(pancakeFringe)
 
     print("FOUND:"+currStateStr)
+
+def pancakeDFS(startPancakeSeq:PancakeSeq):
+    # AI:----------------
+    pancakeFringe = []
+    pancakeClosedSet = set([]) #contains all of the visited node states already
+    PancakeStack.printGivenStack(pancakeFringe)
+
+    num_pancakestates = math.factorial(len(startPancakeSeq.seq))
+    currStateSeq = startPancakeSeq
+    goalStateSeq = None
+
+    #Adding start state to fringe
+    pancakeFringe.append(currStateSeq)
+
+    #Number of total states = n! where n is the number of pancakes
+    #In our case n = 4, thus 4! = 24 total possible states
+    while(num_pancakestates>=len(pancakeClosedSet) or len(pancakeFringe)==0):
+        currStateSeq = pancakeFringe.__getitem__(0)#get first pancake state in fringe
+        pancakeFringe.remove(currStateSeq)#Remove from fringe
+
+
+
+        #Converting pancakeSeqString into a pancake list and get all possible flip states from it
+        currStatePancakeList = PancakeStack.convertPancakeSeqStrToList(currStateSeq.seq)
+        PancakeStack.printGivenStack(currStatePancakeList)
+
+        #Add to closed set
+        if(currStateSeq.seq not in pancakeClosedSet):
+            pancakeClosedSet.add(currStateSeq.seq)
+
+            #Expanding states (Creating branch/children nodes for current node)
+            expandedStates = [] #Children nodes
+            for pancake in currStatePancakeList:
+                childSeq = PancakeSeq(PancakeStack.SimFlipPancakes(currStatePancakeList,pancake.position,True))
+                print("POS:"+str(pancake.position)+"|Seq:"+currStateSeq.seq)
+                childSeq.flipPosition = pancake.position
+                childSeq.parent=currStateSeq
+                expandedStates.append(childSeq)
+
+            currStateSeq.children = expandedStates
+
+            print("EXPANDED STATES:")
+            print(expandedStates)
+
+            print("CLOSED SET:")
+            print(pancakeClosedSet)
+            #pancakeFringe.append("2555")
+            print("FRINGE AFTER EXPANDING: ")
+            #print(pancakeFringe)
+
+            pancakeFringe = expandedStates+pancakeFringe[0:len(pancakeFringe)]
+            print(pancakeFringe)
+
+            if (PancakeStack.SimHasReachedGoal(currStateSeq.seq)):
+                print("BROKE OUT BECAUSE FOUND GOAL")
+                goalStateSeq = currStateSeq
+                break
+
+    print("FOUND:"+goalStateSeq.seq)
+
+    temp = goalStateSeq
+    print("PATH FROM GOAL TO ROOT")
+    if (temp.flipPosition == 1):
+        print("FLIPPED " + str(temp.flipPosition) + "st largest pancake to get:" + temp.__str__())
+    elif (temp.flipPosition == 2):
+        print("FLIPPED " + str(temp.flipPosition) + "nd largest pancake to get:" + temp.__str__())
+    elif (temp.flipPosition == 3):
+        print("FLIPPED " + str(temp.flipPosition) + "rd largest pancake to get:" + temp.__str__())
+    elif (temp.isRoot):
+        print("Started at Root:" + temp.__str__())
+    else:
+        print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
+
+    while(True):
+        if(temp.parent.flipPosition==1):
+            print("FLIPPED " + str(temp.parent.flipPosition) + "st largest pancake to get:" + temp.parent.__str__())
+        elif(temp.parent.flipPosition==2):
+            print("FLIPPED " + str(temp.parent.flipPosition) + "nd largest pancake to get:" + temp.parent.__str__())
+        elif(temp.parent.flipPosition==3):
+            print("FLIPPED " + str(temp.parent.flipPosition) + "rd largest pancake to get:" + temp.parent.__str__())
+        elif(temp.parent.isRoot):
+            print("Started with:" + temp.parent.__str__())
+        else:
+            print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.parent.__str__())
+
+
+        temp = temp.parent
+
+        if(temp.isRoot):
+            #print("FOUND ROOT")
+            break
+
 
 def pancakeProblem():
     pancakestack = PancakeStack()
@@ -529,8 +650,7 @@ def main():
     # testFringe.remove(str1)
     # print(testFringe)
 
-    #pancakeDFS("3124")
-    #pancakeDFS("2314")
-    pancakeDFS("35198764")
+
+    pancakeDFS(PancakeSeq("56898",isRoot=True))
 
 main()
