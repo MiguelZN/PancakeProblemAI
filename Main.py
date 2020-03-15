@@ -456,43 +456,74 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
             print(pancakeFringe)
 
             if (PancakeStack.SimHasReachedGoal(currStateSeq.seq)):
-                print("BROKE OUT BECAUSE FOUND GOAL")
+                print("BROKE OUT BECAUSE FOUND GOAL\n\n")
                 goalStateSeq = currStateSeq
                 break
 
-    print("FOUND:"+goalStateSeq.seq)
+    #print("FOUND:"+goalStateSeq.seq)
 
     temp = goalStateSeq
-    print("PATH FROM GOAL TO ROOT")
+    #print("PATH FROM GOAL TO ROOT")
+    instructions = []
+
+
+
     if (temp.flipPosition == 1):
-        print("FLIPPED " + str(temp.flipPosition) + "st largest pancake to get:" + temp.__str__())
+        #print("FLIPPED " + str(temp.flipPosition) + "st largest pancake to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.flipPosition) + "st largest pancake to get:" + temp.__str__())
     elif (temp.flipPosition == 2):
-        print("FLIPPED " + str(temp.flipPosition) + "nd largest pancake to get:" + temp.__str__())
+        #print("FLIPPED " + str(temp.flipPosition) + "nd largest pancake to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.flipPosition) + "nd largest pancake to get:" + temp.__str__())
     elif (temp.flipPosition == 3):
-        print("FLIPPED " + str(temp.flipPosition) + "rd largest pancake to get:" + temp.__str__())
+        #print("FLIPPED " + str(temp.flipPosition) + "rd largest pancake to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.flipPosition) + "rd largest pancake to get:" + temp.__str__())
     elif (temp.isRoot):
-        print("Started at Root:" + temp.__str__())
+        #print("Started at Root:" + temp.__str__())
+        instructions.append("Started at Root:" + temp.__str__())
     else:
-        print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
+        #print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
 
     while(True):
-        if(temp.parent.flipPosition==1):
-            print("FLIPPED " + str(temp.parent.flipPosition) + "st largest pancake to get:" + temp.parent.__str__())
-        elif(temp.parent.flipPosition==2):
-            print("FLIPPED " + str(temp.parent.flipPosition) + "nd largest pancake to get:" + temp.parent.__str__())
-        elif(temp.parent.flipPosition==3):
-            print("FLIPPED " + str(temp.parent.flipPosition) + "rd largest pancake to get:" + temp.parent.__str__())
-        elif(temp.parent.isRoot):
-            print("Started with:" + temp.parent.__str__())
-        else:
-            print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.parent.__str__())
-
+        if(temp.parent!=None):
+            if(temp.parent.flipPosition==1):
+                #print("FLIPPED " + str(temp.parent.flipPosition) + "st largest pancake to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "st largest pancake to get:" + temp.parent.__str__())
+            elif(temp.parent.flipPosition==2):
+                #print("FLIPPED " + str(temp.parent.flipPosition) + "nd largest pancake to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "nd largest pancake to get:" + temp.parent.__str__())
+            elif(temp.parent.flipPosition==3):
+                #print("FLIPPED " + str(temp.parent.flipPosition) + "rd largest pancake to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "rd largest pancake to get:" + temp.parent.__str__())
+            elif(temp.parent.isRoot):
+                #print("Started with:" + temp.parent.__str__())
+                ''
+            else:
+                #print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.parent.__str__())
 
         temp = temp.parent
 
-        if(temp.isRoot):
+        if(temp==None):
             #print("FOUND ROOT")
             break
+
+        if(temp.isRoot):
+            break
+
+    instructions.reverse()
+    print("Printing instructions:")
+    print("Started with:" + startPancakeSeq.__str__())
+
+    for i in range(0,len(instructions)):
+        line=instructions[i]
+        print(str(i+1)+") "+line)
+
+    print("Finished:" + goalStateSeq.seq)
+
+    print("Finished in "+str(len(instructions))+" steps.")
+
+
 
 
 def pancakeProblem():
@@ -571,7 +602,7 @@ def pancakeProblem():
         else:
             inputoption = int(inputoption[0])
 
-            print("Flipping pancake:"+str(inputoption))
+            #print("FLipping pancake:"+str(inputoption))
             pancakestack.flipPancakes(inputoption)
             print("HAS REACHED GOAL?:" + str(pancakestack.hasReachedGoal()))
 
@@ -651,6 +682,6 @@ def main():
     # print(testFringe)
 
 
-    pancakeDFS(PancakeSeq("56898",isRoot=True))
+    pancakeDFS(PancakeSeq("84543",isRoot=True))
 
 main()
