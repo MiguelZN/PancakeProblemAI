@@ -482,7 +482,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
         instructions.append("Started at Root:" + temp.__str__())
     else:
         #print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
-        instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.flipPosition) + "th largest pancake to get:" + temp.__str__())
 
     while(True):
         if(temp.parent!=None):
