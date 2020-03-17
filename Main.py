@@ -17,8 +17,58 @@ class PancakeSeq:
         self.children = None
         self.isRoot=isRoot
 
-        self.flipPosition = -1 #-1 should be root
+        self.parentFlipPosition = -1 #This is the position that was flipped from Parent pancake sequence to get to this sequence (self)
 
+        self.largestPancake = -1
+        self.smallestPancake = -1
+        self.findSmallestLargestPancakes()
+
+    #Finds the smallest and largest pancakes in the sequence
+    def findSmallestLargestPancakes(self):
+        self.smallestPancake = int(self.seq[0])
+        self.largestPancake = int(self.seq[0])
+        for c in self.seq:
+            curr_num = int(c)
+            if(curr_num<self.smallestPancake):
+                self.smallestPancake = curr_num
+
+            if(curr_num>self.largestPancake):
+                self.largestPancake=curr_num
+
+    def drawStackOfPancakes(self, multiplier=2, includeID=True):
+        foundationlen = self.largestPancake*multiplier
+
+        for i in range(len(self.seq)-1,-1,-1):
+            currDigit = int(self.seq[i])
+            currLen = currDigit*multiplier
+            numSpaces= int((foundationlen-currLen)/2)*multiplier
+
+            currPancakeDrawStr = ""
+
+            if (includeID):
+                currPancakeDrawStr = "ID:" + str(currDigit) + "|" + (
+                            ' ' * numSpaces) + ('-' * multiplier * currLen)
+            else:
+                currPancakeDrawStr = (' ' * numSpaces) + ('-' * multiplier * currLen)
+            print(currPancakeDrawStr)
+
+    def getDrawStackOfPancakesStr(self, multiplier=2, includeID=True):
+        pancakeStackStr = ""
+        foundationlen = self.largestPancake*multiplier
+
+        for i in range(len(self.seq)-1,-1,-1):
+            currDigit = int(self.seq[i])
+            currLen = currDigit*multiplier
+            numSpaces= int((foundationlen-currLen)/2)*multiplier
+            currPancakeDrawStr =""
+
+            if(includeID):
+                currPancakeDrawStr = "ID:"+str(currDigit)+"|"+(' ' * numSpaces) + ('-' * multiplier * currLen)
+            else:
+                currPancakeDrawStr = (' '*numSpaces)+('-'*multiplier*currLen)
+            pancakeStackStr+=currPancakeDrawStr+'\n'
+
+        return pancakeStackStr
 
     def __eq__(self, other):
         if(isinstance(other, PancakeSeq)):
@@ -28,6 +78,11 @@ class PancakeSeq:
         else:
             return False
 
+    #This gets the ID of the pancake that was flipped to get this current sequence using the position (int)
+    def getIntPancakeIDFromParentFlipPosition(self):
+        parentSeqStr = self.parent.seq
+        ID = int(parentSeqStr[len(parentSeqStr)-self.parentFlipPosition])
+        return ID
 
     def getSeq(self):
         return self.seq
@@ -437,7 +492,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
             for pancake in currStatePancakeList:
                 childSeq = PancakeSeq(PancakeStack.SimFlipPancakes(currStatePancakeList,pancake.position,True))
                 print("POS:"+str(pancake.position)+"|Seq:"+currStateSeq.seq)
-                childSeq.flipPosition = pancake.position
+                childSeq.parentFlipPosition = pancake.position
                 childSeq.parent=currStateSeq
                 expandedStates.append(childSeq)
 
@@ -466,41 +521,48 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
     #print("PATH FROM GOAL TO ROOT")
     instructions = []
 
+    instructions.append(temp.getDrawStackOfPancakesStr())
 
+    if (temp.parentFlipPosition == 1):
+        #print("FLIPPED " + str(temp.parentFlipPosition) + "st largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "st pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__())
 
-    if (temp.flipPosition == 1):
-        #print("FLIPPED " + str(temp.flipPosition) + "st largest pancake to get:" + temp.__str__())
-        instructions.append("FLIPPED " + str(temp.flipPosition) + "st largest pancake to get:" + temp.__str__())
-    elif (temp.flipPosition == 2):
-        #print("FLIPPED " + str(temp.flipPosition) + "nd largest pancake to get:" + temp.__str__())
-        instructions.append("FLIPPED " + str(temp.flipPosition) + "nd largest pancake to get:" + temp.__str__())
-    elif (temp.flipPosition == 3):
-        #print("FLIPPED " + str(temp.flipPosition) + "rd largest pancake to get:" + temp.__str__())
-        instructions.append("FLIPPED " + str(temp.flipPosition) + "rd largest pancake to get:" + temp.__str__())
+    elif (temp.parentFlipPosition == 2):
+        #print("FLIPPED " + str(temp.parentFlipPosition) + "nd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "nd pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__())
+    elif (temp.parentFlipPosition == 3):
+        #print("FLIPPED " + str(temp.parentFlipPosition) + "rd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "rd pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__())
     elif (temp.isRoot):
         #print("Started at Root:" + temp.__str__())
         instructions.append("Started at Root:" + temp.__str__())
     else:
-        #print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.__str__())
-        instructions.append("FLIPPED " + str(temp.flipPosition) + "th largest pancake to get:" + temp.__str__())
+        #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "th largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__())
+        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "th pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__())
+
+
+
 
     while(True):
         if(temp.parent!=None):
-            if(temp.parent.flipPosition==1):
-                #print("FLIPPED " + str(temp.parent.flipPosition) + "st largest pancake to get:" + temp.parent.__str__())
-                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "st largest pancake to get:" + temp.parent.__str__())
-            elif(temp.parent.flipPosition==2):
-                #print("FLIPPED " + str(temp.parent.flipPosition) + "nd largest pancake to get:" + temp.parent.__str__())
-                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "nd largest pancake to get:" + temp.parent.__str__())
-            elif(temp.parent.flipPosition==3):
-                #print("FLIPPED " + str(temp.parent.flipPosition) + "rd largest pancake to get:" + temp.parent.__str__())
-                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "rd largest pancake to get:" + temp.parent.__str__())
+            instructions.append(temp.parent.getDrawStackOfPancakesStr())
+            if(temp.parent.parentFlipPosition==1):
+                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "st largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "st pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__())
+            elif(temp.parent.parentFlipPosition==2):
+                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "nd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "nd pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__())
+            elif(temp.parent.parentFlipPosition==3):
+                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "rd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "rd pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__())
             elif(temp.parent.isRoot):
                 #print("Started with:" + temp.parent.__str__())
                 ''
             else:
-                #print("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.parent.__str__())
-                instructions.append("FLIPPED " + str(temp.parent.flipPosition) + "th largest pancake to get:" + temp.parent.__str__())
+                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "th largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__())
+                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "th pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__())
+
+
 
         temp = temp.parent
 
@@ -515,15 +577,21 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
     print("Printing instructions:")
     print("Started with:" + startPancakeSeq.__str__())
 
+    index = 0
     for i in range(0,len(instructions)):
         line=instructions[i]
-        print(str(i+1)+") "+line)
+
+        if('-' in line):
+            print(line)
+        else:
+            index += 1
+            print("Step "+str(index) + ") " + line)
 
     print("Finished:" + goalStateSeq.seq)
 
     print("Finished in "+str(len(instructions))+" steps.")
 
-
+    goalStateSeq.drawStackOfPancakes()
 
 
 def pancakeProblem():
@@ -569,6 +637,7 @@ def pancakeProblem():
 
     DFSorAStar = textinput[len(textinput)-1]
     position = len(textinput)-1
+
     for i in range(0,len(textinput),1):
         curr_char = textinput.__getitem__(i)
 
@@ -682,6 +751,6 @@ def main():
     # print(testFringe)
 
 
-    pancakeDFS(PancakeSeq("84543",isRoot=True))
+    pancakeDFS(PancakeSeq("286954",isRoot=True))
 
 main()
