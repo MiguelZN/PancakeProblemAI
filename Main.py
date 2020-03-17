@@ -589,7 +589,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
     print("Finished:" + goalStateSeq.seq)
 
-    print("Finished in "+str(len(instructions))+" steps.")
+    print("Finished in "+str(index)+" steps.")
 
     goalStateSeq.drawStackOfPancakes()
 
