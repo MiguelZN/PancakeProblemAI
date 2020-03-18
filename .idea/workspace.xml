@@ -15,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="591" column="29" lean-forward="true" selection-start-line="591" selection-start-column="29" selection-end-line="591" selection-end-column="29" />
+            <state relative-caret-position="78">
+              <caret line="828" column="24" selection-start-line="828" selection-start-column="24" selection-end-line="828" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -44,6 +44,13 @@
       <find>(ID:&quot;+temp.parent.id +&quot;)to</find>
       <find>(ID:&quot;+str(temp.getIntPancakeIDFromParentFlipPosition())+&quot;)</find>
       <find>(ID:&quot;+temp.id +&quot;)</find>
+      <find>__str__()</find>
+      <find>Actual Cost</find>
+      <find>Actual Cost:&quot;+str(actualCost)</find>
+      <find>Current Cost</find>
+      <find>Flip Cost</find>
+      <find>parentToSelfCost</find>
+      <find>STACK</find>
     </findStrings>
     <replaceStrings>
       <replace>#print(&quot;FL</replace>
@@ -52,6 +59,15 @@
       <replace>(ID:&quot;+temp.get +&quot;)to</replace>
       <replace>(ID:&quot;+str(temp.getIntPancakeIDFromParentFlipPosition(self))+&quot;)to</replace>
       <replace>(ID:&quot;+str(temp.getIntPancakeIDFromParentFlipPosition())+&quot;)</replace>
+      <replace>&quot;Actual Cost:&quot;+str(actualCost)</replace>
+      <replace>&quot;+'\n'Actual Cost:&quot;+str(actualCost)</replace>
+      <replace>__str__()+&quot;\nActual Cost:&quot;+str(actualCost)</replace>
+      <replace>Current Cost</replace>
+      <replace>Current Cost:&quot;+str(temp.</replace>
+      <replace>Current Cost:&quot;+str(temp.parentToSelfCost)</replace>
+      <replace>Flip Cost</replace>
+      <replace>Actual Cost</replace>
+      <replace>rootToSelfCost</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -150,7 +166,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3299363" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.30828026" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -167,8 +183,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="591" column="29" lean-forward="true" selection-start-line="591" selection-start-column="29" selection-end-line="591" selection-end-column="29" />
+        <state relative-caret-position="78">
+          <caret line="828" column="24" selection-start-line="828" selection-start-column="24" selection-end-line="828" selection-end-column="24" />
         </state>
       </provider>
     </entry>
