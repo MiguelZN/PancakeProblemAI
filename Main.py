@@ -19,6 +19,7 @@ class PancakeSeq:
 
         self.parentFlipPosition = -1 #This is the position that was flipped from Parent pancake sequence to get to this sequence (self)
         self.parentToSelfCost = 0
+
         self.rootToSelfCost = 0 #G(x)
         self.heuristicCost = self.heuristicFunction() #H(x)
         self.fNCost = 0 #this will not be changed until we get the rootToSelfCost F(x)
@@ -103,6 +104,18 @@ class PancakeSeq:
             pancakeStackStr+=currPancakeDrawStr+'\n'
 
         return pancakeStackStr
+
+    def getFlipStrGivenPosition(pancakeSeqStr:str,position:int, returnFlipped=False):
+        flipstr = ""
+        if(returnFlipped):
+            indexforposition = len(pancakeSeqStr) - position
+            flippedsection = pancakeSeqStr[indexforposition:len(pancakeSeqStr)]
+            flipstr = pancakeSeqStr[0:indexforposition] + flippedsection[::-1]
+        else:
+            indexforposition = len(pancakeSeqStr)-position
+            flipstr = pancakeSeqStr[0:indexforposition]+'|'+pancakeSeqStr[indexforposition:len(pancakeSeqStr)]
+        print(flipstr)
+        return flipstr
 
     def __eq__(self, other):
         if(isinstance(other, PancakeSeq)):
@@ -414,7 +427,6 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
     pancakeFringe = []
     pancakeClosedSet = set([]) #contains all of the visited node states already
     PancakeStack.printGivenStack(pancakeFringe)
-    actualCost = 0 #the total cost to flip/accumulation of total amount of pancakes flipped
 
     num_pancakestates = math.factorial(len(startPancakeSeq.seq))
     currStateSeq = startPancakeSeq
@@ -456,19 +468,15 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
                 childSeq.parentToSelfCost = pancake.position
                 childSeq.parent=currStateSeq
 
-                childSeq.rootToSelfCost=actualCost+childSeq.parentToSelfCost
+
                 childSeq.fNCost = currStateSeq.heuristicCost+childSeq.rootToSelfCost
 
                 if(childSeq.seq not in pancakeClosedSet):
                     expandedStates.append(childSeq)
 
             #Calculating Flip Cost (G(x))
-            actualCost += currStateSeq.parentToSelfCost  # Gets the pancake flip cost
-            currStateSeq.rootToSelfCost = actualCost
-
-            #Getting the F(x) cost = heuristic + total Flip Cost = h(x) + g(x)
-            #currStateSeq.fNCost = currStateSeq.heuristicCost+currStateSeq.rootToSelfCost
-
+            if(currStateSeq.parent!=None):
+                currStateSeq.rootToSelfCost = currStateSeq.parent.rootToSelfCost + currStateSeq.parentToSelfCost
 
             currStateSeq.children = expandedStates
 
@@ -490,54 +498,20 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
                 goalStateSeq = currStateSeq
                 break
 
-
-
-
-    #print("FOUND:"+goalStateSeq.seq)
-
     temp = goalStateSeq
     #print("PATH FROM GOAL TO ROOT")
     instructions = []
 
     instructions.append(temp.getDrawStackOfPancakesStr())
-
-    #"Actual Cost:" + str(actualCost)
-
-    if (temp.parentFlipPosition == 1):
-        #print("FLIPPED " + str(temp.parentFlipPosition) + "st largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "st pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-
-    elif (temp.parentFlipPosition == 2):
-        #print("FLIPPED " + str(temp.parentFlipPosition) + "nd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "nd pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-    elif (temp.parentFlipPosition == 3):
-        #print("FLIPPED " + str(temp.parentFlipPosition) + "rd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "rd pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-    elif (temp.isRoot):
-        #print("Started at Root:" + temp.__str__()+"\nActual Cost:"+str(actualCost))
-        instructions.append("Started at Root:" + temp.__str__()+"\nActual Cost:"+str(actualCost))
-    else:
-        #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "th largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "th pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
+    instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.seq, temp.parentFlipPosition) + " g=" + str(temp.parent.rootToSelfCost) + ",h=" + str(temp.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.seq,temp.parentFlipPosition,True))
 
     while(True):
-        if(temp.parent!=None):
-            instructions.append(temp.parent.getDrawStackOfPancakesStr())
-            if(temp.parent.parentFlipPosition==1):
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "st largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\Actual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "st pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-            elif(temp.parent.parentFlipPosition==2):
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "nd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\Actual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "nd pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-            elif(temp.parent.parentFlipPosition==3):
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "rd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\Actual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "rd pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-            elif(temp.parent.isRoot):
-                #print("Started with:" + temp.parent.__str__()+"\nActual Cost:"+str(actualCost))
-                ''
+        if(temp.parent.parent!=None):
+            if(temp.parent.parent.seq==goalStateSeq.seq):
+                return
             else:
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "th largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "th pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
+                instructions.append(temp.parent.getDrawStackOfPancakesStr())
+                instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition)+" g="+str(temp.parent.parent.rootToSelfCost)+",h="+str(temp.parent.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition,True))
 
         temp = temp.parent
 
@@ -548,23 +522,26 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
         if(temp.isRoot):
             break
 
-    instructions.reverse()
+
+
     print("Printing instructions:")
     print("Started with:" + startPancakeSeq.__str__())
 
     index = 0
-    for i in range(0,len(instructions)):
+    for i in range(len(instructions)-1,-1,-1):
         line=instructions[i]
 
-        if('-' in line):
-            print(line)
-        else:
+        if('->' in line):
             index += 1
-            print("Step "+str(index) + ") " + line)
+            print("Step " + str(index) + ") " + line)
+        else:
+            print(line)
 
     print("Finished:" + goalStateSeq.seq)
-    print("Total Actual Cost:"+str(actualCost))
+    print("Total Actual Cost:"+str(goalStateSeq.rootToSelfCost))
     print("Finished in "+str(index)+" steps using AStar.")
+
+    #print(goalStateSeq.fNCost)
 
     goalStateSeq.drawStackOfPancakes()
 
@@ -605,7 +582,6 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
     pancakeFringe = []
     pancakeClosedSet = set([]) #contains all of the visited node states already
     PancakeStack.printGivenStack(pancakeFringe)
-    actualCost = 0 #the total cost to flip/accumulation of total amount of pancakes flipped
 
     num_pancakestates = math.factorial(len(startPancakeSeq.seq))
     currStateSeq = startPancakeSeq
@@ -639,8 +615,9 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
                 if (childSeq.seq not in pancakeClosedSet):
                     expandedStates.append(childSeq)
 
-            actualCost += currStateSeq.parentToSelfCost  # Gets the pancake flip cost
-            currStateSeq.rootToSelfCost = actualCost
+            # Calculating Flip Cost (G(x))
+            if (currStateSeq.parent != None):
+                currStateSeq.rootToSelfCost = currStateSeq.parent.rootToSelfCost + currStateSeq.parentToSelfCost
 
             currStateSeq.children = expandedStates
 
@@ -665,52 +642,19 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
     #print("FOUND:"+goalStateSeq.seq)
 
     temp = goalStateSeq
-    #print("PATH FROM GOAL TO ROOT")
+    # print("PATH FROM GOAL TO ROOT")
     instructions = []
 
     instructions.append(temp.getDrawStackOfPancakesStr())
-
-
-    if (temp.parentFlipPosition == 1):
-        #print("FLIPPED " + str(temp.parentFlipPosition) + "st largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "st pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-
-    elif (temp.parentFlipPosition == 2):
-        #print("FLIPPED " + str(temp.parentFlipPosition) + "nd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "nd pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-    elif (temp.parentFlipPosition == 3):
-        #print("FLIPPED " + str(temp.parentFlipPosition) + "rd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "rd pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-    elif (temp.isRoot):
-        #print("Started at Root:" + temp.__str__()+"\nActual Cost:"+str(actualCost))
-        instructions.append("Started at Root:" + temp.__str__()+"\nActual Cost:"+str(actualCost))
-    else:
-        #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "th largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-        instructions.append("FLIPPED " + str(temp.parentFlipPosition) + "th pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.__str__()+"\nActual Cost:"+str(temp.rootToSelfCost))
-
-
-
+    instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.seq, temp.parentFlipPosition) + " g=" + str(temp.parent.rootToSelfCost) + ",h=" + str(temp.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.seq,temp.parentFlipPosition,True))
 
     while(True):
-        if(temp.parent!=None):
-            instructions.append(temp.parent.getDrawStackOfPancakesStr())
-            if(temp.parent.parentFlipPosition==1):
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "st largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\Actual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "st pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-            elif(temp.parent.parentFlipPosition==2):
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "nd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\Actual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "nd pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-            elif(temp.parent.parentFlipPosition==3):
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "rd largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\Actual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "rd pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-            elif(temp.parent.isRoot):
-                #print("Started with:" + temp.parent.__str__()+"\nActual Cost:"+str(actualCost))
-                ''
+        if(temp.parent.parent!=None):
+            if(temp.parent.parent.seq==goalStateSeq.seq):
+                return
             else:
-                #print("FLIPPED " + str(temp.parent.parentFlipPosition) + "th largest pancake(ID:"+str(temp.getIntPancakeIDFromParentFlipPosition(self))+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-                instructions.append("FLIPPED " + str(temp.parent.parentFlipPosition) + "th pancake(ID:"+str(temp.parent.getIntPancakeIDFromParentFlipPosition())+")to get:" + temp.parent.__str__()+"\nActual Cost:"+str(temp.parent.rootToSelfCost))
-
-
+                instructions.append(temp.parent.getDrawStackOfPancakesStr())
+                instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition)+" g="+str(temp.parent.parent.rootToSelfCost)+",h="+str(temp.parent.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition,True))
 
         temp = temp.parent
 
@@ -721,23 +665,22 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
         if(temp.isRoot):
             break
 
-    instructions.reverse()
     print("Printing instructions:")
     print("Started with:" + startPancakeSeq.__str__())
 
     index = 0
-    for i in range(0,len(instructions)):
-        line=instructions[i]
+    for i in range(len(instructions) - 1, -1, -1):
+        line = instructions[i]
 
-        if('-' in line):
-            print(line)
-        else:
+        if ('->' in line):
             index += 1
-            print("Step "+str(index) + ") " + line)
+            print("Step " + str(index) + ") " + line)
+        else:
+            print(line)
 
     print("Finished:" + goalStateSeq.seq)
-    print("Total Actual Cost:"+str(actualCost))
-    print("Finished in "+str(index)+" steps using DFS.")
+    print("Total Actual Cost:" + str(goalStateSeq.rootToSelfCost))
+    print("Finished in " + str(index) + " steps using DFS.")
 
     goalStateSeq.drawStackOfPancakes()
 
@@ -838,12 +781,9 @@ def pancakeProblem():
 
 
 def main():
-    testseq = "874952"
-    #pancakeDFS(PancakeSeq(testseq,isRoot=True))
+    testseq = "4287"
+    pancakeDFS(PancakeSeq(testseq,isRoot=True))
     pancakeAStar(PancakeSeq(testseq, isRoot=True))
     #tiebreakingFunction(PancakeSeq("3421"),PancakeSeq("4321"))
-
-    print(PancakeSeq("9835").heuristicCost)
-
 
 main()
