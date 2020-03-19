@@ -687,7 +687,7 @@ def pancakeProblem():
     currentGameMode = None
     pancakestack = None
     typeInSequenceStr = "Enter a sequence of digits representing your pancakes"
-    typeInFlipPositionStr = "Type in a digit representing which pancake position to flip\n(left side digits represent position):"
+    typeInFlipPositionStr = "Type in a digit representing which pancake position to flip\n(left side digits represent position)\n(type 'exit' to exit):"
     flipMoves = 0
     numberOfPancakesFlipped = 0
     while(menuOption!="exit"):
@@ -799,5 +799,8 @@ def main():
     #pancakeDFS(PancakeSeq(testseq,isRoot=True))
     #print("\n\n\n")
     #pancakeAStar(PancakeSeq(testseq, isRoot=True))
-    pancakeProblem()
+    try:
+        pancakeProblem()
+    except:
+        ''
 main()
