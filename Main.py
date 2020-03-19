@@ -1,4 +1,10 @@
 import math,copy
+from enum import Enum
+
+class GameMode(Enum):
+    MANUAL = "MANUAL"
+    DFS = "DFS"
+    ASTAR = "ASTAR"
 
 class Pancake:
 
@@ -71,40 +77,33 @@ class PancakeSeq:
                 self.largestPancake=curr_num
 
     def drawStackOfPancakes(self, multiplier=2, includeID=True):
-        foundationlen = self.largestPancake*multiplier
-
-        for i in range(len(self.seq)-1,-1,-1):
-            currDigit = int(self.seq[i])
-            currLen = currDigit*multiplier
-            numSpaces= int((foundationlen-currLen)/2)*multiplier
-
-            currPancakeDrawStr = ""
-
-            if (includeID):
-                currPancakeDrawStr = "ID:" + str(currDigit) + "|" + (
-                            ' ' * numSpaces) + ('-' * multiplier * currLen)
-            else:
-                currPancakeDrawStr = (' ' * numSpaces) + ('-' * multiplier * currLen)
-            print(currPancakeDrawStr)
+        print(PancakeSeq.drawGivenStackOfPancakes(self.seq))
 
     def getDrawStackOfPancakesStr(self, multiplier=2, includeID=True):
-        pancakeStackStr = ""
-        foundationlen = self.largestPancake*multiplier
+        return PancakeSeq.drawGivenStackOfPancakes(self.seq)
 
-        for i in range(len(self.seq)-1,-1,-1):
-            currDigit = int(self.seq[i])
+    def drawGivenStackOfPancakes(pancakesequence:str, multiplier=2, includeID=True):
+        pancakeStackStr = ""
+
+        curr = PancakeSeq(pancakesequence)
+        foundationlen = curr.largestPancake*multiplier
+
+        print(pancakesequence)
+        for i in range(len(curr.seq)-1,-1,-1):
+            currDigit = int(curr.seq[i])
             currLen = currDigit*multiplier
             numSpaces= int((foundationlen-currLen)/2)*multiplier
             currPancakeDrawStr =""
 
             if(includeID):
-                currPancakeDrawStr = "ID:"+str(currDigit)+"|"+(' ' * numSpaces) + ('-' * multiplier * currLen)
+                currPancakeDrawStr = str(PancakeSeq.getPositionOfPancakeStrGivenIndex(pancakesequence,i))+"| "+(' ' * numSpaces) + ('-' * multiplier * currLen)+(' ' * numSpaces) + " |ID:"+str(currDigit)
             else:
                 currPancakeDrawStr = (' '*numSpaces)+('-'*multiplier*currLen)
             pancakeStackStr+=currPancakeDrawStr+'\n'
 
         return pancakeStackStr
 
+    #Returns a string representing the sequence of pancakes as digits after being flipped given a position(int)
     def getFlipStrGivenPosition(pancakeSeqStr:str,position:int, returnFlipped=False):
         flipstr = ""
         if(returnFlipped):
@@ -114,8 +113,11 @@ class PancakeSeq:
         else:
             indexforposition = len(pancakeSeqStr)-position
             flipstr = pancakeSeqStr[0:indexforposition]+'|'+pancakeSeqStr[indexforposition:len(pancakeSeqStr)]
-        print(flipstr)
+        #print(flipstr)
         return flipstr
+
+    def getPositionOfPancakeStrGivenIndex(seqOfPancakes:str, index):
+        return len(seqOfPancakes)-index
 
     def __eq__(self, other):
         if(isinstance(other, PancakeSeq)):
@@ -149,11 +151,12 @@ class PancakeSeq:
         else:
             return 0
 
-    def getFlipCostGivenPosition(self, flipPosition:int):
+    def getFlipCostGivenPositionSelf(self, flipPosition:int):
         if(flipPosition>0 and flipPosition<=len(self.seq)):
             return flipPosition
         else:
             return 0
+
 
 
 
@@ -178,7 +181,7 @@ class PancakeStack:
         else:
             self.stack = self.stack+[pancake]
 
-        self.stack=PancakeStack.getSortedStackBottomToTop(self.stack)
+        #self.stack=PancakeStack.getSortedStackBottomToTop(self.stack)
         PancakeStack.SimReassignPositions(self.stack)
 
 
@@ -229,41 +232,17 @@ class PancakeStack:
         print(returnstr)
 
     def drawStack(self):
-
-        print("TOP")
-        spaceadd = len(self.stack)
-        for i in range(len(self.stack)-1,-1,-1):
-            pancake = self.stack.__getitem__(i)
-            drawline = "-"
-            drawlineMulti=2
-
-
-            print(str(pancake.position)+"|Pancake"+str(pancake.id)+":"+(" "*spaceadd)+((pancake.id*drawlineMulti)*drawline))
-            spaceadd-=1
-
-        print("BOTTOM")
+        print(PancakeSeq.drawGivenStackOfPancakes(PancakeStack.returnPancakeListAsStr(self.stack)))
 
     def drawGivenStack(listOfPancakes):
-
-        print("TOP")
-        spaceadd = len(listOfPancakes)
-        for i in range(len(listOfPancakes)-1,-1,-1):
-            pancake = listOfPancakes.__getitem__(i)
-            drawline = "-"
-            drawlineMulti=2
-
-
-            print(str(pancake.position)+"|Pancake"+str(pancake.id)+":"+(" "*spaceadd)+((pancake.id*drawlineMulti)*drawline))
-            spaceadd-=1
-
-        print("BOTTOM")
+        print(PancakeSeq.drawGivenStackOfPancakes(PancakeStack.returnPancakeListAsStr(listOfPancakes)))
 
     def SimHasReachedGoal(PancakeSeqStr:str):
         stack = PancakeStack.convertPancakeSeqStrToList(PancakeSeqStr)
 
-        PancakeStack.printGivenStack(stack)
+        #PancakeStack.printGivenStack(stack)
         goalstack = PancakeStack.getSortedStackBottomToTop(stack)
-        PancakeStack.printGivenStack(goalstack)
+        #PancakeStack.printGivenStack(goalstack)
         #print(goalstack)
         #self.printGivenStack(goalstack)
 
@@ -279,9 +258,11 @@ class PancakeStack:
                 hasreachedgoal = False
 
         if(hasreachedgoal):
-            print("The seq:"+PancakeSeqStr+" has reached GOAL")
+            ''
+            #print("The seq:"+PancakeSeqStr+" has reached GOAL")
         else:
-            print("The seq:" + PancakeSeqStr + " has NOT reached GOAL")
+            ''
+            #print("The seq:" + PancakeSeqStr + " has NOT reached GOAL")
 
         return hasreachedgoal
 
@@ -316,7 +297,7 @@ class PancakeStack:
                 foundid = True
 
         if(foundid==False):
-            print("DID NOT FIND PANCAKE ID, enter valid pancake id...")
+            #print("DID NOT FIND PANCAKE ID, enter valid pancake id...")
             return
 
 
@@ -336,7 +317,7 @@ class PancakeStack:
 
     def convertPancakeSeqStrToList(pancakeseq:str):
         listOfPancakes = []
-        print("SEQ:"+pancakeseq)
+        #print("SEQ:"+pancakeseq)
         if(pancakeseq.isnumeric()):
             position=len(pancakeseq)
             for i in range(0,len(pancakeseq),1):
@@ -351,6 +332,11 @@ class PancakeStack:
         else:
             print("ERROR-Not a sequence")
 
+    def convertPancakeListToSeqStr(listOfPancakes):
+        seq = ""
+        for pancake in listOfPancakes:
+            seq+=pancake.id
+        return seq
 
 
     # Successor function:
@@ -380,7 +366,7 @@ class PancakeStack:
 
         if(ReturnAsString):
             pancakeliststr = PancakeStack.returnPancakeListAsStr(pretendlist)
-            print(pancakeliststr)
+            #print(pancakeliststr)
             return pancakeliststr
         else:
             return pretendlist
@@ -426,7 +412,7 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
     # AI:----------------
     pancakeFringe = []
     pancakeClosedSet = set([]) #contains all of the visited node states already
-    PancakeStack.printGivenStack(pancakeFringe)
+    #PancakeStack.printGivenStack(pancakeFringe)
 
     num_pancakestates = math.factorial(len(startPancakeSeq.seq))
     currStateSeq = startPancakeSeq
@@ -447,7 +433,7 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
             elif(smallestFNCostpancake!=pancake.seq and smallestFNCostpancake.fNCost==pancake.fNCost):
                 smallestFNCostpancake = tiebreakingFunction(smallestFNCostpancake,pancake)
         currStateSeq = smallestFNCostpancake
-        print("SMALLEST F(X) COST:"+str(smallestFNCostpancake))
+        #print("SMALLEST F(X) COST:"+str(smallestFNCostpancake))
         pancakeFringe.remove(currStateSeq)  # Remove from fringe
 
 
@@ -463,7 +449,7 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
             expandedStates = [] #Children nodes
             for pancake in currStatePancakeList:
                 childSeq = PancakeSeq(PancakeStack.SimFlipPancakes(currStatePancakeList,pancake.position,True))
-                print("POS:"+str(pancake.position)+"|Seq:"+currStateSeq.seq)
+                #print("POS:"+str(pancake.position)+"|Seq:"+currStateSeq.seq)
                 childSeq.parentFlipPosition = pancake.position
                 childSeq.parentToSelfCost = pancake.position
                 childSeq.parent=currStateSeq
@@ -480,21 +466,21 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
 
             currStateSeq.children = expandedStates
 
-            print("EXPANDED STATES:")
-            print(expandedStates)
+            #print("EXPANDED STATES:")
+            #print(expandedStates)
 
-            print("CLOSED SET:")
-            print(pancakeClosedSet)
+            #print("CLOSED SET:")
+            #print(pancakeClosedSet)
             #pancakeFringe.append("2555")
-            print("FRINGE AFTER EXPANDING: ")
+            #print("FRINGE AFTER EXPANDING: ")
             #print(pancakeFringe)
 
             pancakeFringe = expandedStates+pancakeFringe[0:len(pancakeFringe)]
-            print(pancakeFringe)
+            #print(pancakeFringe)
 
             #Checking if the current pancake sequence is sorted (GOAL State)
             if (PancakeStack.SimHasReachedGoal(currStateSeq.seq)):
-                print("BROKE OUT BECAUSE FOUND GOAL\n\n")
+                #print("BROKE OUT BECAUSE FOUND GOAL\n\n")
                 goalStateSeq = currStateSeq
                 break
 
@@ -526,6 +512,8 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
 
     print("Printing instructions:")
     print("Started with:" + startPancakeSeq.__str__())
+    startPancakeSeq.drawStackOfPancakes()
+    print("")
 
     index = 0
     for i in range(len(instructions)-1,-1,-1):
@@ -581,7 +569,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
     # AI:----------------
     pancakeFringe = []
     pancakeClosedSet = set([]) #contains all of the visited node states already
-    PancakeStack.printGivenStack(pancakeFringe)
+    #PancakeStack.printGivenStack(pancakeFringe)
 
     num_pancakestates = math.factorial(len(startPancakeSeq.seq))
     currStateSeq = startPancakeSeq
@@ -598,7 +586,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
         #Converting pancakeSeqString into a pancake list and get all possible flip states from it
         currStatePancakeList = PancakeStack.convertPancakeSeqStrToList(currStateSeq.seq)
-        PancakeStack.printGivenStack(currStatePancakeList)
+        #PancakeStack.printGivenStack(currStatePancakeList)
 
         #Add to closed set
         if(currStateSeq.seq not in pancakeClosedSet):
@@ -608,7 +596,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
             expandedStates = [] #Children nodes
             for pancake in currStatePancakeList:
                 childSeq = PancakeSeq(PancakeStack.SimFlipPancakes(currStatePancakeList,pancake.position,True))
-                print("POS:"+str(pancake.position)+"|Seq:"+currStateSeq.seq)
+                #print("POS:"+str(pancake.position)+"|Seq:"+currStateSeq.seq)
                 childSeq.parentFlipPosition = pancake.position
                 childSeq.parentToSelfCost = pancake.position
                 childSeq.parent=currStateSeq
@@ -621,21 +609,21 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
             currStateSeq.children = expandedStates
 
-            print("EXPANDED STATES:")
-            print(expandedStates)
+            #print("EXPANDED STATES:")
+            #print(expandedStates)
 
-            print("CLOSED SET:")
-            print(pancakeClosedSet)
+            #print("CLOSED SET:")
+            #print(pancakeClosedSet)
             #pancakeFringe.append("2555")
-            print("FRINGE AFTER EXPANDING: ")
+            #print("FRINGE AFTER EXPANDING: ")
             #print(pancakeFringe)
 
             pancakeFringe = expandedStates+pancakeFringe[0:len(pancakeFringe)]
-            print(pancakeFringe)
+            #print(pancakeFringe)
 
             #Checking if the current pancake sequence is sorted (GOAL State)
             if (PancakeStack.SimHasReachedGoal(currStateSeq.seq)):
-                print("BROKE OUT BECAUSE FOUND GOAL\n\n")
+                #print("BROKE OUT BECAUSE FOUND GOAL\n\n")
                 goalStateSeq = currStateSeq
                 break
 
@@ -667,6 +655,8 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
     print("Printing instructions:")
     print("Started with:" + startPancakeSeq.__str__())
+    startPancakeSeq.drawStackOfPancakes()
+    print("")
 
     index = 0
     for i in range(len(instructions) - 1, -1, -1):
@@ -689,101 +679,125 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
 def pancakeProblem():
     pancakestack = PancakeStack()
-    textinput = ""
-    requirements = "####X" #where X is either 'a' or 'b'
-
-
-
-
-    try:
-        #Input should be four sequence digits, and a 'd' or 'a' character fifth place
-        textinput = input("Enter input for Pancake Problem:"+ requirements[0:len(requirements)-1]+'d or '+ requirements[0:len(requirements)-1]+"a\n")
-    except:
-        ""
-
-    #Error catching for incorrect input-----------------
-    isGoodInput = False
-
-    try:
-        for i in range(0,len(requirements),1):
-            if(i==len(requirements)-1 and textinput[i].isalpha()):
-                isGoodInput = True
-
-            if(i<len(requirements)-1 and textinput[i].isdigit()==False):
-                isGoodInput = False
-                break
-    except:
-        ""
-
-
-
-
-    try:
-        if(isGoodInput==False):
-            raise Exception("ERROR: the input needs to be "+ requirements[0:len(requirements)-1]+'d or '+ requirements[0:len(requirements)-1]+'a')
-    except Exception as error:
-        print("Caught error:"+repr(error))
-        return
-    #---------------------------------------------------
-
-
-
-    DFSorAStar = textinput[len(textinput)-1]
-    position = len(textinput)-1
-
-    for i in range(0,len(textinput),1):
-        curr_char = textinput.__getitem__(i)
-
-        if(curr_char.isdigit()):
-            pancakestack.addPancake(Pancake(int(curr_char),position), False)
-            position-=1
-
-    print("HAS REACHED GOAL?:" + str(pancakestack.hasReachedGoal()))
+    sequenceOfPancakesTextInput = ""
 
 
     #MENU:------------
-    inputoption = -1#start value
-    while(inputoption!="exit"):
-        #pancakestack.printStack(True)
-        pancakestack.drawStack()
-        pancakestack.printStack(False)
-        print("")
-        #pancakestack.heuristicFunction()
-        print("Enter a number to flip pancakes:")
-        print("(OR enter 'exit' to exit)")
-
-        #try:
-        inputoption = input("")
-
-        if(inputoption=="exit"):
+    menuOption = -1#start value
+    currentGameMode = None
+    pancakestack = None
+    typeInSequenceStr = "Enter a sequence of digits representing your pancakes"
+    typeInFlipPositionStr = "Type in a digit representing which pancake position to flip\n(left side digits represent position):"
+    flipMoves = 0
+    numberOfPancakesFlipped = 0
+    while(menuOption!="exit"):
+        if(menuOption=="exit"):
             print("Exiting...")
             break
-        elif(inputoption[0].isdigit()==False):
-            print("Enter a single digit number representing the id of pancake to flip...")
-            continue
+        elif(menuOption=="1"):
+
+            if(currentGameMode==None):
+                currentGameMode = GameMode.MANUAL
+                pancakestack = PancakeStack()
+                print(typeInSequenceStr)
+                sequenceOfPancakesTextInput = input("")
+
+                if (sequenceOfPancakesTextInput == "exit"):
+                    currentGameMode = None
+                    menuOption = -1
+                    continue
+
+                position = len(sequenceOfPancakesTextInput) - 1
+
+                for i in range(0, len(sequenceOfPancakesTextInput), 1):
+                    curr_char = sequenceOfPancakesTextInput.__getitem__(i)
+                    #print(curr_char)
+
+                    if (curr_char.isdigit()):
+                        pancakestack.addPancake(Pancake(int(curr_char), position), True)
+                        position -= 1
+                    elif (curr_char.isalpha()):
+                        print("ERROR: cannot enter characters, only a sequence of digits")
+
+            elif(currentGameMode==GameMode.MANUAL):
+                    PancakeStack.drawGivenStack(pancakestack.stack)
+
+                    print(typeInFlipPositionStr)
+                    flipChoiceTextInput=input("")
+
+                    if(flipChoiceTextInput=="exit"):
+                        currentGameMode = None
+                        menuOption = -1
+                        continue
+
+                    flipChoice = int(flipChoiceTextInput[0])
+                    print("Flipping pancake:"+str(flipChoice))
+                    pancakestack.flipPancakes(flipChoice)
+                    flipMoves+=1
+                    numberOfPancakesFlipped+=flipChoice
+                    #print("HAS REACHED GOAL?:" + str(pancakestack.hasReachedGoal()))
+
+                    if(pancakestack.hasReachedGoal()):
+                        PancakeStack.drawGivenStack(pancakestack.stack)
+                        print("Congratulations, you have sorted the pancakes!")
+                        print("You used "+str(flipMoves)+" moves to solve this.")
+                        print("You flipped a total of "+str(numberOfPancakesFlipped)+" pancakes.")
+                        print("Press Enter to Continue..")
+                        input("")
+                        currentGameMode=None
+                        flipMoves=0
+                        numberOfPancakesFlipped=0
+                        menuOption = -1
+
+        elif(menuOption=="2"):
+            print("Selected to use the DFS algorithm!")
+
+            print(typeInSequenceStr)
+            sequenceOfPancakesTextInput = input("")
+
+            if (sequenceOfPancakesTextInput == "exit"):
+                currentGameMode = None
+                menuOption = -1
+                continue
+
+            pancakeDFS(PancakeSeq(sequenceOfPancakesTextInput,isRoot=True))
+
+            print("Press Enter to Continue...")
+            menuOption = -1
+            input("")
+            print("\n\n")
+        elif(menuOption=="3"):
+            print("Selected to use the AStar algorithm!")
+
+            print(typeInSequenceStr)
+            sequenceOfPancakesTextInput = input("")
+
+            if (sequenceOfPancakesTextInput == "exit"):
+                currentGameMode = None
+                menuOption = -1
+                continue
+
+            pancakeAStar(PancakeSeq(sequenceOfPancakesTextInput, isRoot=True))
+
+            print("Press Enter to Continue...")
+            menuOption = -1
+            input("")
+            print("\n\n")
         else:
-            inputoption = int(inputoption[0])
+            print("Enter an option:\n1|Flip pancakes manually\n2|Use DFS algorithm\n3|Use AStar algorithm")
+            print("(OR type and enter: 'exit' to exit menu)")
 
-            #print("FLipping pancake:"+str(inputoption))
-            pancakestack.flipPancakes(inputoption)
-            print("HAS REACHED GOAL?:" + str(pancakestack.hasReachedGoal()))
-
-        #except:
-        #    print("Error in option selection")
+            menuOption = input("")
 
 
 
-
-
-
-    print(textinput)
 
 
 
 def main():
-    testseq = "4287"
-    pancakeDFS(PancakeSeq(testseq,isRoot=True))
-    pancakeAStar(PancakeSeq(testseq, isRoot=True))
-    #tiebreakingFunction(PancakeSeq("3421"),PancakeSeq("4321"))
-
+    #testseq = "451"
+    #pancakeDFS(PancakeSeq(testseq,isRoot=True))
+    #print("\n\n\n")
+    #pancakeAStar(PancakeSeq(testseq, isRoot=True))
+    pancakeProblem()
 main()
