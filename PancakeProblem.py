@@ -97,7 +97,7 @@ class PancakeSeq:
         curr = PancakeSeq(pancakesequence)
         foundationlen = curr.largestPancake*multiplier
 
-        print(pancakesequence)
+        #print(pancakesequence)
         for i in range(len(curr.seq)-1,-1,-1):
             currDigit = int(curr.seq[i])
             currLen = currDigit*multiplier
