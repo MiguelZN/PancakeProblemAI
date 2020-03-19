@@ -1,13 +1,20 @@
 import math,copy
 from enum import Enum
 
+'''Miguel Zavala
+3/19/20
+CISC481-Intro to Dear AI
+Dr. Rahmat
+'''
+
+#Enumeration to keep track of game modes for commandline menu
 class GameMode(Enum):
     MANUAL = "MANUAL"
     DFS = "DFS"
     ASTAR = "ASTAR"
 
+#Old class used for PancakeStack, still used
 class Pancake:
-
     def __init__(self, id, position=-1):
         self.position = position
         self.id = id
@@ -16,40 +23,39 @@ class Pancake:
         #return "Pancake" + str(self.id)
         return "POS:"+str(self.position)+";Pancake"+str(self.id)
 
+#Class used as a state node within DFS and AStar algorithms
 class PancakeSeq:
     def __init__(self, seq:str, parent = None, children = None, isRoot=False):
-        self.seq = seq
-        self.parent = parent
-        self.children = None
-        self.isRoot=isRoot
+        self.seq = seq #String: The pancake sequence that this state resembles
+        self.parent = parent #PancakeSeq:Parent state of this state
+        self.children = None #List of PancakeSeq:Keeps track of the children states per state
+        self.isRoot=isRoot #Boolean:Used to tell if it is the root state
 
-        self.parentFlipPosition = -1 #This is the position that was flipped from Parent pancake sequence to get to this sequence (self)
-        self.parentToSelfCost = 0
+        self.parentFlipPosition = -1 #Int:This is the position that was flipped from Parent pancake sequence to get to this sequence (self)
+        self.parentToSelfCost = 0 #Int: This keeps track of the number of pancakes flipped from parent state to this state
 
-        self.rootToSelfCost = 0 #G(x)
-        self.heuristicCost = self.heuristicFunction() #H(x)
-        self.fNCost = 0 #this will not be changed until we get the rootToSelfCost F(x)
+        #Search Algorithm Variables:
+        self.rootToSelfCost = 0 #G(x):Int - keeps track of the total amount of pancakes flipped to get to this state from root
+        self.heuristicCost = self.heuristicFunction() #H(x):Int - finds the largest pancake out of order in this current state
+        self.fNCost = 0 #F(x):Int - This keeps track of the G(x)+H(x) values
 
-        self.largestPancake = -1
-        self.smallestPancake = -1
-        self.findSmallestLargestPancakes()
+        #Other variables:
+        self.largestPancake = -1 #Int:Keeps track of the largest pancake in sequence
+        self.smallestPancake = -1 #Int:Keeps track of the smallest pancake in sequence
+        self.findSmallestLargestPancakes() #Function that sets the self.largestPancake and self.smallestPancake variables
 
     def __repr__(self):
         return self.seq
 
-    # returns the largest pancake id not in order (COST)
+    #Returns Int:the largest pancake id
     def heuristicFunction(self):
         listOfPancakes = PancakeStack.convertPancakeSeqStrToList(self.seq)
-        # self.printStack(False)
-        # sortedstack = sorted(self.__stack,key=lambda x: x.id, reverse = True)
-        # self.printStack(False)
         sortedstack = PancakeStack.getSortedStackBottomToTop(listOfPancakes)
         largestnoninorder_pancake = None
 
         for i in range(0, len(listOfPancakes)):
             sortedpancake = sortedstack.__getitem__(i)
             currpancake = listOfPancakes.__getitem__(i)
-
 
             if (sortedpancake.id == currpancake.id):
                 ''
@@ -64,7 +70,7 @@ class PancakeSeq:
         else:
             return largestnoninorder_pancake.id
 
-    #Finds the smallest and largest pancakes in the sequence
+    #Sets the smallest and largest pancakes in the sequence
     def findSmallestLargestPancakes(self):
         self.smallestPancake = int(self.seq[0])
         self.largestPancake = int(self.seq[0])
@@ -76,12 +82,15 @@ class PancakeSeq:
             if(curr_num>self.largestPancake):
                 self.largestPancake=curr_num
 
+    #Prints the stack of pancakes
     def drawStackOfPancakes(self, multiplier=2, includeID=True):
         print(PancakeSeq.drawGivenStackOfPancakes(self.seq))
 
+    #Returns a string of the stack of pancakes
     def getDrawStackOfPancakesStr(self, multiplier=2, includeID=True):
         return PancakeSeq.drawGivenStackOfPancakes(self.seq)
 
+    #Returns a string that is a draw representation any given pancake sequence string
     def drawGivenStackOfPancakes(pancakesequence:str, multiplier=2, includeID=True):
         pancakeStackStr = ""
 
@@ -116,6 +125,7 @@ class PancakeSeq:
         #print(flipstr)
         return flipstr
 
+    #Returns Int:the position of a pancake given its index within the sequence string
     def getPositionOfPancakeStrGivenIndex(seqOfPancakes:str, index):
         return len(seqOfPancakes)-index
 
@@ -127,7 +137,7 @@ class PancakeSeq:
         else:
             return False
 
-    #This gets the ID of the pancake that was flipped to get this current sequence using the position (int)
+    #Returns Int: this gets the ID of the pancake that was flipped to get this current sequence using the position (int)
     def getIntPancakeIDFromParentFlipPosition(self):
         parentSeqStr = self.parent.seq
         ID = int(parentSeqStr[len(parentSeqStr)-self.parentFlipPosition])
@@ -159,13 +169,12 @@ class PancakeSeq:
 
 
 
-
+#Old class used as starter reference
+#Still is used to work with array/list functions variation of pancakes
 class PancakeStack:
     def __init__(self):
         self.stack = []
         self.__contained = {}
-
-
 
     def addPancake(self, pancake:Pancake, duplicates=False):
 
@@ -189,11 +198,9 @@ class PancakeStack:
     def getStack(self):
         return self.stack
 
+    #Takes in any list of Pancake objects and lists them from Bottom to Top
     def printGivenStack(listofpancakes, topDownView=False, asStr=False):
         returnstr = ""
-
-        #if(asStr):
-
 
         if(topDownView):
             returnstr = "Top---\n"
@@ -214,22 +221,7 @@ class PancakeStack:
 
 
     def printStack(self, topDownView=False):
-        returnstr = ""
-
-        if(topDownView):
-            returnstr = "Top---\n"
-            for x in range(len(self.stack)-1,-1,-1):
-                returnstr += self.stack.__getitem__(x).__str__() + '\n'
-
-            returnstr+="Bottom---"
-        else:
-            returnstr = "|BOTTOM|["
-            for x in self.stack:
-                returnstr += x.__str__()+','
-            returnstr = returnstr[0:len(returnstr)-1]+"]|TOP|"
-
-
-        print(returnstr)
+        PancakeStack.printGivenStack(self.stack,topDownView)
 
     def drawStack(self):
         print(PancakeSeq.drawGivenStackOfPancakes(PancakeStack.returnPancakeListAsStr(self.stack)))
@@ -237,6 +229,7 @@ class PancakeStack:
     def drawGivenStack(listOfPancakes):
         print(PancakeSeq.drawGivenStackOfPancakes(PancakeStack.returnPancakeListAsStr(listOfPancakes)))
 
+    #Returns Boolean: whether a pancake sequence is sorted from largest (bottom) to smallest (top)
     def SimHasReachedGoal(PancakeSeqStr:str):
         stack = PancakeStack.convertPancakeSeqStrToList(PancakeSeqStr)
 
@@ -271,9 +264,9 @@ class PancakeStack:
 
         return hasreachedgoal
 
-    def reassignPositions(self):
-        PancakeStack.SimReassignPositions(self.stack)
 
+    #Goes through a list of Pancake objects and reassigns their self.position variable in accordance to their
+    #index location within the list
     def SimReassignPositions(listOfPancakes):
         #PancakeStack.printGivenStack(listOfPancakes)
         position = len(listOfPancakes)
@@ -282,10 +275,11 @@ class PancakeStack:
             currpancake.position = position
             #print("NEW POSITION:"+str(currpancake.position))
             position-=1
+    def reassignPositions(self):
+        PancakeStack.SimReassignPositions(self.stack)
 
 
-
-    #Successor function:
+    #Successor function: (Not used since PancakeSeq is now the state class used)
     #Flips the by the position of the pancake
     def flipPancakes(self, posnumber:int):
 
@@ -300,8 +294,6 @@ class PancakeStack:
             #print("DID NOT FIND PANCAKE ID, enter valid pancake id...")
             return
 
-
-
         bottomlist = self.stack[0:splitindex]
         toplist = self.stack[splitindex:len(self.stack)]
         toplist.reverse()
@@ -309,12 +301,14 @@ class PancakeStack:
         self.stack = bottomlist+toplist
         self.reassignPositions()
 
+    #Takes in a list of Pancake objects and returns it as a string
     def returnPancakeListAsStr(listOfPancakes):
         returnStr = ""
         for pancake in listOfPancakes:
             returnStr += str(pancake.id)
         return returnStr
 
+    #Takes in a pancake sequence string EX: '4321' and returns a list of Pancake objects matching that string
     def convertPancakeSeqStrToList(pancakeseq:str):
         listOfPancakes = []
         #print("SEQ:"+pancakeseq)
@@ -332,11 +326,6 @@ class PancakeStack:
         else:
             print("ERROR-Not a sequence")
 
-    def convertPancakeListToSeqStr(listOfPancakes):
-        seq = ""
-        for pancake in listOfPancakes:
-            seq+=pancake.id
-        return seq
 
 
     # Successor function:
@@ -391,7 +380,7 @@ class PancakeStack:
 
 
 
-#Takes in two Pancake lists and returns the higher valued Pancake sequence
+#Takes in two PancakeSeq states and returns the higher valued PancakeSeq
 def tiebreakingFunction(pancakeseq1:PancakeSeq, pancakeseq2:PancakeSeq):
     fourdigitnum1 = int(pancakeseq1.seq)
     #print(fourdigitnum1)
@@ -408,6 +397,8 @@ def tiebreakingFunction(pancakeseq1:PancakeSeq, pancakeseq2:PancakeSeq):
     return None
 
 
+#Takes in a PancakeSeq object
+#Uses the AStar Informed Search Algorithm to determine the steps needed to solve a Pancake Sequence
 def pancakeAStar(startPancakeSeq:PancakeSeq):
     # AI:----------------
     pancakeFringe = []
@@ -486,8 +477,9 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
 
     temp = goalStateSeq
     #print("PATH FROM GOAL TO ROOT")
-    instructions = []
 
+    #Creates the instruction set/steps to get to goal state
+    instructions = []
     instructions.append(temp.getDrawStackOfPancakesStr())
     instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.seq, temp.parentFlipPosition) + " g=" + str(temp.parent.rootToSelfCost) + ",h=" + str(temp.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.seq,temp.parentFlipPosition,True))
 
@@ -533,7 +525,7 @@ def pancakeAStar(startPancakeSeq:PancakeSeq):
 
     goalStateSeq.drawStackOfPancakes()
 
-#returns the largest pancake id not in order (COST)
+#Returns Int: the largest pancake (ID) found out of order
 def heuristicFunction(pancakeSeq:PancakeSeq):
     listOfPancakes=PancakeStack.convertPancakeSeqStrToList(pancakeSeq.seq)
     #self.printStack(False)
@@ -559,12 +551,8 @@ def heuristicFunction(pancakeSeq:PancakeSeq):
     else:
         return largestnoninorder_pancake.id
 
-
-def createPancakeHeap(startPancakeSeq:str):
-    ''
-
-
-
+#Takes in a PancakeSeq object
+#Uses the DFS Uninformed Search Algorithm to determine the steps needed to solve a Pancake Sequence
 def pancakeDFS(startPancakeSeq:PancakeSeq):
     # AI:----------------
     pancakeFringe = []
@@ -631,10 +619,12 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
     temp = goalStateSeq
     # print("PATH FROM GOAL TO ROOT")
-    instructions = []
 
+
+    #Creates the instruction set/steps to get to goal state
+    instructions = []
     instructions.append(temp.getDrawStackOfPancakesStr())
-    instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.seq, temp.parentFlipPosition) + " g=" + str(temp.parent.rootToSelfCost) + ",h=" + str(temp.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.seq,temp.parentFlipPosition,True))
+    instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.seq, temp.parentFlipPosition) + " g=" + str(temp.parent.rootToSelfCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.seq,temp.parentFlipPosition,True))
 
     while(True):
         if(temp.parent.parent!=None):
@@ -642,7 +632,7 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
                 return
             else:
                 instructions.append(temp.parent.getDrawStackOfPancakesStr())
-                instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition)+" g="+str(temp.parent.parent.rootToSelfCost)+",h="+str(temp.parent.parent.heuristicCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition,True))
+                instructions.append(PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition)+" g="+str(temp.parent.parent.rootToSelfCost)+"-> "+PancakeSeq.getFlipStrGivenPosition(temp.parent.parent.seq,temp.parent.parentFlipPosition,True))
 
         temp = temp.parent
 
@@ -676,11 +666,15 @@ def pancakeDFS(startPancakeSeq:PancakeSeq):
 
 
 
+#Method that allows user interaction in the form of a commandline menu
+#Allows the user to
+#   1)select to manually flip pancakes
+#   2)Use the DFS algorithm on a pancake sequence that a user types in
+#   3)Use the AStar algorithm on a pancake sequence that a user types in
 
 def pancakeProblem():
     pancakestack = PancakeStack()
     sequenceOfPancakesTextInput = ""
-
 
     #MENU:------------
     menuOption = -1#start value
@@ -793,14 +787,13 @@ def pancakeProblem():
 
 
 
-
+#Main method function:
 def main():
-    #testseq = "451"
-    #pancakeDFS(PancakeSeq(testseq,isRoot=True))
-    #print("\n\n\n")
-    #pancakeAStar(PancakeSeq(testseq, isRoot=True))
     try:
         pancakeProblem()
     except:
         ''
+
+
+#Run:
 main()
